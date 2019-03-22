@@ -1,0 +1,52 @@
+FUNCTION_BLOCK Basinc
+
+VAR_INPUT
+    sicaklik: REAL;
+    hacim: REAL;   
+END_VAR
+
+VAR_OUTPUT
+    basinc: REAL;
+END_VAR
+//BULANIKLAŞTIRMA
+
+FUZZIFY sicaklik
+    TERM soguk := trape 0 0 10 18;
+    TERM ilik:=trian 10 24 34;
+    TERM sicak :=trape 24 40 60 60;
+END_FUZZIFY
+
+FUZZIFY hacim
+    TERM kucuk := trape 5 5 50 75;
+    TERM orta:= trian 35 100 150;
+    TERM buyuk:=trape 100 200 300 300;
+END_FUZZIFY
+
+//Durulama
+DEFUZZIFY basinc
+    TERM cok_dusuk := (0.900,1) (0.950,0);
+    TERM dusuk := trian 0.930 0.950 0.970;
+    TERM normal :=trian 0.955 0.980 1;
+    TERM yuksek := trian 0.980 1 1.060;
+    TERM cok_yuksek := trape 1 1.100 1.200 1.200;
+
+    METHOD : COG;
+    DEFAULT := 1;//KURAL ÇALIŞMazsa
+
+END_DEFUZZIFY
+//MAMDANI MODEL KURALLAR
+RULEBLOCK  kurallarblok
+    RULE 1 : IF sicaklik IS soguk AND hacim IS kucuk THEN basinc IS normal;
+    RULE 2 : IF sicaklik IS soguk AND hacim IS orta THEN basinc IS dusuk;
+    RULE 3 : IF sicaklik IS soguk AND hacim IS buyuk THEN basinc IS cok_dusuk;
+    RULE 4 : IF sicaklik IS ilik AND hacim IS kucuk THEN basinc IS yuksek;
+    RULE 5 : IF sicaklik IS ilik AND hacim IS orta THEN basinc IS normal;
+    RULE 6 : IF sicaklik IS ilik AND hacim IS buyuk THEN basinc IS dusuk;
+    RULE 7 : IF sicaklik IS sicak AND hacim IS kucuk THEN basinc IS cok_yuksek;
+    RULE 8 : IF sicaklik IS sicak AND hacim IS orta THEN basinc IS yuksek;
+    RULE 9 : IF sicaklik IS sicak AND hacim IS buyuk THEN basinc IS normal;
+
+END_RULEBLOCK
+
+
+END_FUNCTION_BLOCK
